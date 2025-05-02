@@ -1,0 +1,14 @@
+C:\Naga\HCL\HCL-FullStack-Gov_Task\medical-register-app-2\src\main\java\com\example\controller\LogoutController.java
+C:\Naga\HCL\HCL-FullStack-Gov_Task\medical-register-app-2\src\main\java\com\example\controller\MedicalRecordController.java
+C:\Naga\HCL\HCL-FullStack-Gov_Task\medical-register-app-2\src\main\java\com\example\MedicalRegisterApplication.java
+C:\Naga\HCL\HCL-FullStack-Gov_Task\medical-register-app-2\src\main\java\com\example\repository\AuditLogRepository.java
+C:\Naga\HCL\HCL-FullStack-Gov_Task\medical-register-app-2\src\main\java\com\example\service\AuditService.java
+C:\Naga\HCL\HCL-FullStack-Gov_Task\medical-register-app-2\src\main\java\com\example\service\MedicalRecordService.java
+C:\Naga\HCL\HCL-FullStack-Gov_Task\medical-register-app-2\src\main\java\com\example\model\AuditLog.java
+C:\Naga\HCL\HCL-FullStack-Gov_Task\medical-register-app-2\src\main\java\com\example\config\SecurityConfig.java
+C:\Naga\HCL\HCL-FullStack-Gov_Task\medical-register-app-2\src\main\java\com\example\model\MedicalRecord.java
+C:\Naga\HCL\HCL-FullStack-Gov_Task\medical-register-app-2\src\main\java\com\example\config\OAuth2ClientConfig.java
+C:\Naga\HCL\HCL-FullStack-Gov_Task\medical-register-app-2\src\main\java\com\example\controller\HomeController.java
+C:\Naga\HCL\HCL-FullStack-Gov_Task\medical-register-app-2\src\main\java\com\example\audit\LoggingAspect.java
+C:\Naga\HCL\HCL-FullStack-Gov_Task\medical-register-app-2\src\main\java\com\example\controller\CustomErrorController.java
+C:\Naga\HCL\HCL-FullStack-Gov_Task\medical-register-app-2\src\main\java\com\example\repository\MedicalRecordRepository.java

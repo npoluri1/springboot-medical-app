@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Medical Records</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+    <style>
+        /* Global Styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+
+        h1 {
+            text-align: center;
+            color: #007bff;
+            margin: 20px 0;
+        }
+
+        /* Table Styles */
+        .records-table-container {
+            width: 80%;
+            margin: 20px auto;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background-color: #007bff;
+            color: #fff;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        /* Action Buttons */
+        .actions a,
+        .actions form button {
+            display: inline-block;
+            padding: 6px 12px;
+            text-decoration: none;
+            font-size: 14px;
+            border-radius: 4px;
+            margin-right: 5px;
+        }
+
+        .actions a {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .actions a:hover {
+            background-color: #0056b3;
+        }
+
+        .actions form button {
+            background-color: #dc3545;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+
+        .actions form button:hover {
+            background-color: #b02a37;
+        }
+
+        /* Add New Record Button */
+        .add-record-btn {
+            display: block;
+            width: 200px;
+            margin: 20px auto;
+            padding: 10px 0;
+            text-align: center;
+            background-color: #28a745;
+            color: #fff;
+            text-decoration: none;
+            font-size: 16px;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+        .add-record-btn:hover {
+            background-color: #218838;
+        }
+
+         /* Login Button */
+        .login-btn {
+            display: block;
+            width: 200px;
+            margin: 20px auto;
+            padding: 10px 0;
+            text-align: center;
+            background-color: #007bff;
+            color: #fff;
+            text-decoration: none;
+            font-size: 16px;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+        .login-btn:hover {
+            background-color: #0056b3;
+        }
+
+    </style>
+</head>
+<body>
+<h1>Medical Records</h1>
+<div class="records-table-container">
+    <table>
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Age</th>
+            <th>Medical History</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="record : ${records}">
+            <td th:text="${record.name}">John Doe</td>
+            <td th:text="${record.age}">30</td>
+            <td th:text="${record.medicalHistory}">None</td>
+            <td class="actions">
+                <a th:href="@{/edit/{id}(id=${record.id})}">Edit</a>
+                <form th:action="@{/delete/{id}(id=${record.id})}" method="post" style="display:inline;">
+                    <input type="hidden" name="_method" value="delete" />
+                    <button type="submit">Delete</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<a th:href="@{/add}" class="add-record-btn">Add New Record</a>
+
+</body>
+</html>
