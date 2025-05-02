@@ -11,7 +11,7 @@ This is a CRUD application to manage patient records in a medical register. The 
 - CI/CD pipeline using GitHub Actions
 
 ## Tech Stack
-- Java 17
+- Java 21
 - Spring Boot 3.x (JPA, Security, Thymeleaf)
 - PostgreSQL
 - Auth0 (Mock LDAP Integration)
