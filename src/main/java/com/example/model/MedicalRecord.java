@@ -24,6 +24,8 @@ public class MedicalRecord {
     @Size(max = 500, message = "Medical history must not exceed 500 characters")
     private String medicalHistory;
 
+    private boolean deleted = false; // Soft delete flag
+
     // Getters and setters
     public Long getId() {
         return id;
@@ -55,5 +57,13 @@ public class MedicalRecord {
 
     public void setMedicalHistory(String medicalHistory) {
         this.medicalHistory = medicalHistory;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 }

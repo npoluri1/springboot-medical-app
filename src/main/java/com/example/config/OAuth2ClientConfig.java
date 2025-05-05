@@ -1,10 +1,11 @@
 package com.example.config;
 
+import com.example.util.EnvironmentUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
-import org.springframework.security.oauth2.client.registration.ClientRegistration;
 
 @Configuration
 public class OAuth2ClientConfig {
@@ -12,8 +13,8 @@ public class OAuth2ClientConfig {
     @Bean
     public ClientRegistrationRepository clientRegistrationRepository() {
         ClientRegistration auth0Registration = ClientRegistration.withRegistrationId("auth0")
-                .clientId("i2ZwGpIFW3zljhRbLgQPpe7fg5xqcXdc")
-                .clientSecret("o4JCCW3paBGYQOT8JdiyB9mUwiUNTqs3mox8Cposs6oN8IQX9RVdcXXkraautwdb")
+                .clientId(EnvironmentUtils.getEnv("AUTH0_CLIENT_ID")) // Fetch client ID using utility
+                .clientSecret(EnvironmentUtils.getEnv("AUTH0_CLIENT_SECRET")) // Fetch client secret
                 .scope("openid", "profile", "email")
                 .authorizationUri("https://dev-l5f3fqnk4y5amjwt.us.auth0.com/authorize")
                 .tokenUri("https://dev-l5f3fqnk4y5amjwt.us.auth0.com/oauth/token")
