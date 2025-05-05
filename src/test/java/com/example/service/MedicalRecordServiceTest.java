@@ -2,6 +2,7 @@ package com.example.service;
 
 import com.example.model.MedicalRecord;
 import com.example.repository.MedicalRecordRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -19,12 +20,13 @@ class MedicalRecordServiceTest {
     private MedicalRecordRepository repository;
 
     @Mock
-    private AuditService auditService; // <-- Mock the audit service
+    private AuditService auditService;
 
     @InjectMocks
     private MedicalRecordService service;
 
-    public MedicalRecordServiceTest() {
+    @BeforeEach
+    void setUp() {
         MockitoAnnotations.openMocks(this);
     }
 
@@ -35,21 +37,23 @@ class MedicalRecordServiceTest {
         record1.setName("John Doe");
         record1.setAge(30);
         record1.setMedicalHistory("None");
+        record1.setDeleted(false);
 
         MedicalRecord record2 = new MedicalRecord();
         record2.setId(2L);
         record2.setName("Jane Smith");
         record2.setAge(25);
         record2.setMedicalHistory("Asthma");
+        record2.setDeleted(false);
 
-        when(repository.findAll()).thenReturn(Arrays.asList(record1, record2));
+        when(repository.findByDeleted(false)).thenReturn(Arrays.asList(record1, record2));
 
         var records = service.getAllRecords();
 
         assertNotNull(records);
         assertEquals(2, records.size());
-        verify(repository, times(1)).findAll();
-        verify(auditService, atLeastOnce()).audit(anyString(), anyString(), anyString()); // optional
+        verify(repository, times(1)).findByDeleted(false);
+        verify(auditService, atLeastOnce()).audit(anyString(), eq("GET_ALL"), anyString());
     }
 
     @Test
@@ -59,15 +63,16 @@ class MedicalRecordServiceTest {
         record.setName("John Doe");
         record.setAge(30);
         record.setMedicalHistory("None");
+        record.setDeleted(false);
 
-        when(repository.findById(1L)).thenReturn(Optional.of(record));
+        when(repository.findByIdAndDeleted(1L, false)).thenReturn(Optional.of(record));
 
         var result = service.getRecordById(1L);
 
         assertNotNull(result);
         assertEquals("John Doe", result.getName());
-        verify(repository, times(1)).findById(1L);
-        verify(auditService, atLeastOnce()).audit(anyString(), anyString(), anyString()); // optional
+        verify(repository, times(1)).findByIdAndDeleted(1L, false);
+        verify(auditService, atLeastOnce()).audit(anyString(), eq("GET_BY_ID"), anyString());
     }
 
     @Test
@@ -84,7 +89,7 @@ class MedicalRecordServiceTest {
         assertNotNull(result);
         assertEquals("John Doe", result.getName());
         verify(repository, times(1)).save(record);
-        verify(auditService, atLeastOnce()).audit(anyString(), anyString(), anyString());
+        verify(auditService, atLeastOnce()).audit(anyString(), eq("ADD"), anyString());
     }
 
     @Test
@@ -94,26 +99,62 @@ class MedicalRecordServiceTest {
         record.setName("John Doe");
         record.setAge(30);
         record.setMedicalHistory("None");
+        record.setDeleted(false);
 
-        when(repository.existsById(1L)).thenReturn(true);
+        when(repository.existsByIdAndDeleted(1L, false)).thenReturn(true);
         when(repository.save(record)).thenReturn(record);
 
         var result = service.updateRecord(1L, record);
 
         assertNotNull(result);
         assertEquals("John Doe", result.getName());
-        verify(repository, times(1)).existsById(1L);
+        verify(repository, times(1)).existsByIdAndDeleted(1L, false);
         verify(repository, times(1)).save(record);
-        verify(auditService, atLeastOnce()).audit(anyString(), anyString(), anyString());
+        verify(auditService, atLeastOnce()).audit(anyString(), eq("UPDATE"), anyString());
+    }
+
+    @Test
+    void testUpdateNonExistentRecord() {
+        MedicalRecord record = new MedicalRecord();
+        record.setId(1L);
+        record.setName("John Doe");
+        record.setAge(30);
+        record.setMedicalHistory("None");
+
+        when(repository.existsByIdAndDeleted(1L, false)).thenReturn(false);
+
+        var result = service.updateRecord(1L, record);
+
+        assertNull(result);
+        verify(repository, times(1)).existsByIdAndDeleted(1L, false);
+        verify(auditService, atLeastOnce()).audit(anyString(), eq("UPDATE_FAIL"), anyString());
     }
 
     @Test
     void testDeleteRecord() {
-        doNothing().when(repository).deleteById(1L);
+        MedicalRecord record = new MedicalRecord();
+        record.setId(1L);
+        record.setDeleted(false);
+
+        when(repository.findByIdAndDeleted(1L, false)).thenReturn(Optional.of(record));
+        when(repository.save(any(MedicalRecord.class))).thenReturn(record);
 
         service.deleteRecord(1L);
 
-        verify(repository, times(1)).deleteById(1L);
-        verify(auditService, atLeastOnce()).audit(anyString(), anyString(), anyString());
+        assertTrue(record.isDeleted());
+        verify(repository, times(1)).findByIdAndDeleted(1L, false);
+        verify(repository, times(1)).save(record);
+        verify(auditService, atLeastOnce()).audit(anyString(), eq("DELETE"), anyString());
+    }
+
+    @Test
+    void testDeleteNonExistentRecord() {
+        when(repository.findByIdAndDeleted(1L, false)).thenReturn(Optional.empty());
+
+        service.deleteRecord(1L);
+
+        verify(repository, times(1)).findByIdAndDeleted(1L, false);
+        verify(repository, never()).save(any());
+        verify(auditService, atLeastOnce()).audit(anyString(), eq("DELETE_FAIL"), anyString());
     }
 }

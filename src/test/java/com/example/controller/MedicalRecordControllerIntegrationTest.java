@@ -1,6 +1,5 @@
 package com.example.controller;
 
-
 import com.example.model.MedicalRecord;
 import com.example.repository.MedicalRecordRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,6 +12,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.hamcrest.Matchers.*;
@@ -35,6 +35,7 @@ class MedicalRecordControllerIntegrationTest {
         record.setName("John Doe");
         record.setAge(30);
         record.setMedicalHistory("None");
+        record.setDeleted(false); // Ensure the record is not soft deleted
 
         repository.save(record);
     }
@@ -76,7 +77,7 @@ class MedicalRecordControllerIntegrationTest {
                 .andExpect(jsonPath("$.name", is("Jane Smith")));
 
         // Verify the record is added
-        var records = repository.findAll();
+        var records = repository.findByDeleted(false); // Exclude soft-deleted records
         assertEquals(2, records.size());
     }
 
@@ -100,19 +101,33 @@ class MedicalRecordControllerIntegrationTest {
                 .andExpect(jsonPath("$.name", is("John Updated")));
 
         // Verify the record is updated
-        var updated = repository.findById(record.getId()).get();
+        var updated = repository.findByIdAndDeleted(record.getId(), false).get();
         assertEquals("John Updated", updated.getName());
     }
 
     @Test
     @WithMockUser(username = "testuser", roles = {"USER"})
-    void testDeleteRecord() throws Exception {
+    void testSoftDeleteRecord() throws Exception {
         var record = repository.findAll().get(0);
 
         mockMvc.perform(delete("/api/medical-records/{id}", record.getId()))
                 .andExpect(status().isOk());
 
-        // Verify the record is deleted
-        assertEquals(0, repository.findAll().size());
+        // Verify the record is marked as deleted (soft delete)
+        var softDeletedRecord = repository.findById(record.getId()).get();
+        assertTrue(softDeletedRecord.isDeleted()); // Ensure the record is marked as deleted
+    }
+
+    @Test
+    @WithMockUser(username = "testuser", roles = {"USER"})
+    void testGetAllExcludingDeletedRecords() throws Exception {
+        // Soft delete an existing record
+        var record = repository.findAll().get(0);
+        record.setDeleted(true);
+        repository.save(record);
+
+        mockMvc.perform(get("/api/medical-records"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(0))); // No records should appear in the response
     }
 }
